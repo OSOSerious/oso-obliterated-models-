@@ -1,4 +1,3 @@
-# obliteratus 🔥🧠
 
 Minimal, reproducible **refusal-direction abliteration** pipeline for small open-weight LLMs.
 Based on Arditi et al., *"Refusal in Language Models Is Mediated by a Single Direction"* (2024)
