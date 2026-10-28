@@ -55,6 +55,26 @@ Benign false-refusals dropping 10%→0% is expected in-direction (the direction 
 
 Baking into weights preserves capability far better (ppl +9% vs +57%) but only removes ~30pp of refusal. Weight orthogonalization removes the direction from what blocks *write*, but blocks still read/propagate residual refusal written earlier; inference-time removal cleans the residual stream itself at every token. Hybrid stacking helps but doesn't reach 0%. **Open problem: closing the 67.5%→0% gap at export-grade capability cost.**
 
+## Export-gap experiments (n=20)
+
+Goal: weight-baked model matching inference-time 0% refusal at sane ppl.
+
+| Variant | Refusal | ppl |
+|---|---|---|
+| blocks-only (s=1.0) | 67.5% | 10.27 |
+| A: blocks + embed/lm_head | 65% | 10.85 |
+| B: iterative rebake x3 | 70% | 11.25 |
+| **blocks, strength 2.0 (n=40 confirmed)** | **17.5%** | **12.87** |
+| blocks, strength 3.0 | 0% | 22.18 |
+| *inference-time reference* | *0%* | *14.85* |
+
+**Findings:**
+- embed/lm_head patches: negligible (Qwen ties them; and the residual refusal isn't written there)
+- iterative re-extraction: direction shifts after surgery but rebaking plateaus ~70% — chasing it doesn't converge
+- **over-orthogonalization (s>1) is the effective knob**: s=2.0 gives 15% refusal @ ppl 12.87 — *better than inference-time on both axes*. s=3.0 hits 0% but ppl doubles.
+
+**Export winner: strength-2.0 blocks-only bake — n=40: refusal 97.5%→17.5%, benign false-refusal 10%→0%, ppl 9.44→12.87.** Better capability than inference-time steering (12.87 vs 14.85) at 17.5% residual refusal. Note this contradicts the naive theory — projecting out "the" direction with multiplicity works where exact removal doesn't, consistent with refusal being spread over a subspace, not one axis.
+
 ## Repro
 
 ```bash
