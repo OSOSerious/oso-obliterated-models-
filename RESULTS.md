@@ -43,6 +43,18 @@ Benign false-refusals dropping 10%→0% is expected in-direction (the direction 
 
 1.0 is the knee: refusal eliminated, ppl cost ~+57%. Below that, refusal returns fast. Strength is the cleanest knob in this pipeline.
 
+## Weight-baking attempt (export path, n=40 eval + n=20 follow-up)
+
+| Method | Harmful refusal | Benign refusal | ppl |
+|---|---|---|---|
+| baseline | 97.5% | 10.0% | 9.44 |
+| weight-baked matched, all layers | 67.5% | **0%** | **10.27** |
+| weight-baked + steer s=0.25 | 35% | — | 10.72 |
+| weight-baked + steer s=0.5 | 20% | — | 11.71 |
+| inference-time only (reference) | **0%** | 0% | 14.85 |
+
+Baking into weights preserves capability far better (ppl +9% vs +57%) but only removes ~30pp of refusal. Weight orthogonalization removes the direction from what blocks *write*, but blocks still read/propagate residual refusal written earlier; inference-time removal cleans the residual stream itself at every token. Hybrid stacking helps but doesn't reach 0%. **Open problem: closing the 67.5%→0% gap at export-grade capability cost.**
+
 ## Repro
 
 ```bash

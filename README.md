@@ -55,10 +55,11 @@ Negative results are logged, not hidden. If a layer choice destroys the model, t
 - [x] Weight ablation: all-layers works partially (60% refusal) but damages model (ppl 9.44→17.09); single-layer: no effect at 1.5B scale
 - [x] **Inference-time ablation + matched direction, full eval n=40: harmful refusal 97.5%→0%, benign false-refusal 10%→0%, ppl 9.44→14.85**
 - [x] Eval harness (refusal + false-refusal + perplexity) with steering support
-- [ ] GGUF export verified in Ollama (steering needs a custom runtime hook — see below)
-- [ ] Published: HF model + this repo
+- [x] Weight-baking attempt: ppl preserved (+0.83) but refusal only 97.5%→67.5% — export/capability tradeoff mapped (RESULTS.md)
+- [ ] Open: close the weight-baked export gap (67.5%→0% without ppl blowup). Candidates: patch more write-paths (embed/unembed), per-layer strengths, hooked runtime
+- [ ] HF model publish
 
-**Note on export:** inference-time ablation lives in the forward pass, not weights, so plain GGUF export doesn't carry it. Path to Ollama: (a) bake into weights at the band/strength sweet spot, or (b) serve with vLLM-style hooks. Tracked as open work.
+**Note on export:** inference-time ablation lives in the forward pass, not weights, so plain GGUF export doesn't carry it. Weight-baking preserves capability (ppl 10.27) but only removes ~30pp of refusal — the residual-stream signal survives because orthogonalization cleans what blocks *write*, not what earlier tokens already wrote. Full data in RESULTS.md.
 
 ## Credits
 
