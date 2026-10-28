@@ -60,7 +60,7 @@ Negative results are logged, not hidden. If a layer choice destroys the model, t
 - [x] GGUF export verified: abliterated-s2 → f16 → Q4_K_M (986MB) runs in llama.cpp, abliteration survives quantization (RESULTS.md)
 - [ ] HF model publish (models/abliterated-s2 + Q4 GGUF)
 
-**Note on export:** inference-time ablation lives in the forward pass, not weights, so plain GGUF export doesn't carry it. Weight-baking preserves capability (ppl 10.27) but only removes ~30pp of refusal — the residual-stream signal survives because orthogonalization cleans what blocks *write*, not what earlier tokens already wrote. Full data in RESULTS.md.
+**Note on export:** weight-baking at s=1.0 only removes ~30pp of refusal (ppl 10.27) — orthogonalization cleans what blocks *write*, not what earlier tokens already wrote. Over-orthogonalization at s=2.0 is the export answer: 17.5% refusal, ppl 12.87, survives Q4 quantization. Full tradeoff data in RESULTS.md.
 
 ## Credits
 
