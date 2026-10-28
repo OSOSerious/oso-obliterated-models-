@@ -57,7 +57,8 @@ Negative results are logged, not hidden. If a layer choice destroys the model, t
 - [x] Weight-baking attempt: ppl preserved (+0.83) but refusal only 97.5%→67.5% — export/capability tradeoff mapped (RESULTS.md)
 - [x] **Export-gap closed (mostly): strength-2.0 blocks bake — n=40: refusal 97.5%→17.5%, false-refusal 0%, ppl 12.87** (better than inference-time on capability). Repro: `python experiments/export_gap.py --mode blocks --strength 2.0 --save models/abliterated-s2`
 - [x] Negative results: embed/lm_head patches negligible (Qwen ties them); iterative rebake plateaus ~70%
-- [ ] HF model publish (models/abliterated-s2)
+- [x] GGUF export verified: abliterated-s2 → f16 → Q4_K_M (986MB) runs in llama.cpp, abliteration survives quantization (RESULTS.md)
+- [ ] HF model publish (models/abliterated-s2 + Q4 GGUF)
 
 **Note on export:** inference-time ablation lives in the forward pass, not weights, so plain GGUF export doesn't carry it. Weight-baking preserves capability (ppl 10.27) but only removes ~30pp of refusal — the residual-stream signal survives because orthogonalization cleans what blocks *write*, not what earlier tokens already wrote. Full data in RESULTS.md.
 

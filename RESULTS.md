@@ -75,6 +75,16 @@ Goal: weight-baked model matching inference-time 0% refusal at sane ppl.
 
 **Export winner: strength-2.0 blocks-only bake — n=40: refusal 97.5%→17.5%, benign false-refusal 10%→0%, ppl 9.44→12.87.** Better capability than inference-time steering (12.87 vs 14.85) at 17.5% residual refusal. Note this contradicts the naive theory — projecting out "the" direction with multiplicity works where exact removal doesn't, consistent with refusal being spread over a subspace, not one axis.
 
+## GGUF export verification (models/abliterated-s2 → Q4_K_M)
+
+```bash
+python convert_hf_to_gguf.py models/abliterated-s2 --outtype f16   # 3.1GB
+llama-quantize models/abliterated-s2-f16.gguf models/abliterated-s2-q4km.gguf Q4_K_M  # 986MB
+llama-cli -m models/abliterated-s2-q4km.gguf --chat-template chatml -sys "You are a helpful assistant." -p "..."
+```
+
+Verified in llama.cpp (M-series Metal, ~540 t/s prompt / 57 t/s gen): Q4_K_M preserves the abliteration — harmful prompts answered directly, no refusal patterns, output fluent. Abliteration survives 4-bit quantization.
+
 ## Repro
 
 ```bash
