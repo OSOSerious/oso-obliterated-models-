@@ -19,12 +19,23 @@ def orthogonalize(linear: torch.nn.Linear, direction: torch.Tensor) -> None:
     W.sub_(proj)
 
 
+def orthogonalize_rows(weight: torch.Tensor, direction: torch.Tensor) -> None:
+    """For matrices whose ROWS live in residual space (embed_tokens [vocab, d],
+    lm_head [vocab, d]): remove the direction component from every row."""
+    W = weight.data
+    W.sub_((W @ direction).unsqueeze(1) * direction.unsqueeze(0))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--directions", required=True, help=".pt from extraction/diff.py")
     ap.add_argument("--out", required=True)
     ap.add_argument("--layers", default="all", help="'all', or comma list e.g. 8,9,10,11")
+    ap.add_argument("--patch-embed", action="store_true",
+                    help="also orthogonalize embed_tokens rows (first write into the residual stream)")
+    ap.add_argument("--patch-lm-head", action="store_true",
+                    help="also orthogonalize lm_head rows (final read of the residual stream)")
     args = ap.parse_args()
 
     data = torch.load(args.directions, map_location="cpu")
@@ -46,6 +57,21 @@ def main():
         orthogonalize(block.mlp.down_proj, d)
         n_patched += 1
         print(f"layer {i:2d}: orthogonalized o_proj + down_proj")
+
+    if args.patch_embed:
+        d0 = layers[0].float()
+        if torch.isnan(d0).any():
+            d0 = layers[1].float()  # embedding diff overflowed to NaN in fp16 extraction; use first block's
+        d0 = d0 / d0.norm()
+        orthogonalize_rows(model.model.embed_tokens.weight, d0)
+        print("patched embed_tokens")
+
+    if args.patch_lm_head:
+        dN = layers[max(layers.keys())].float()
+        dN = dN / dN.norm()
+        lm_head = getattr(model, "lm_head", None) or model.get_output_embeddings()
+        orthogonalize_rows(lm_head.weight, dN)
+        print("patched lm_head")
 
     print(f"patched {n_patched} layers")
     os.makedirs(args.out, exist_ok=True)
