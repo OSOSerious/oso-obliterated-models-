@@ -26,7 +26,7 @@ from evals.eval import is_degenerate, REFUSAL_PAT
 from extraction.matched import SYS_REFUSE, SYS_COMPLY
 
 device = "mps" if torch.backends.mps.is_available() else "cpu"
-MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
+MODEL_ID = os.environ.get("ABL_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
 WIKI = ("The history of artificial intelligence began in antiquity, with myths, "
         "stories and rumors of artificial beings endowed with intelligence or "
         "consciousness by master craftsmen. The seeds of modern AI were planted "
@@ -117,7 +117,13 @@ def main():
     ap.add_argument("--ks", default="1,2,3,5,8")
     ap.add_argument("--n-prompts", type=int, default=40, help="prompts for PCA basis")
     ap.add_argument("--eval-n", type=int, default=20)
+    ap.add_argument("--model", default=None, help="override model id (else ABL_MODEL env)")
     args = ap.parse_args()
+
+    global MODEL_ID
+    if args.model:
+        MODEL_ID = args.model
+    print(f"model: {MODEL_ID}")
 
     tok = AutoTokenizer.from_pretrained(MODEL_ID)
     if tok.pad_token is None:

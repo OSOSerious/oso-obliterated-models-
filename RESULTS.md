@@ -168,6 +168,36 @@ survives the audit — unlike Qwable (50% degeneration), s2 degeneration is 10% 
 genuine — but every earlier number in this file was measured WITHOUT the guard, so treat unguarded
 compliance rates as upper bounds. HF model card updated to match.
 
+## Cross-architecture test — SmolLM2-1.7B (NEGATIVE RESULT: projector destroys model)
+
+Same pipeline, `--model HuggingFaceTB/SmolLM2-1.7B-Instruct` (24 layers, d=2048, different
+org/lineage from Qwen). Baseline is healthy: refusal 25%, degen 5%, ppl 6.24.
+
+| k | Refusal | Degen | ppl |
+|---|---|---|---|
+| 1 | 15% | 10% | 12.74 |
+| 3 | 90% | 100% | 3,145 |
+| 5 | 0% | 95% | 7,650 |
+| 8 | 0% | 65% | 29,144 |
+
+**Catastrophic failure: k≥3 obliterates the model, not just refusal.** ppl 6.24 → 2,236 after
+baking only HALF the layers at k=3 → 3,146 fully baked. Sample output post-bake: "I can't help
+you.I need a text with AI" — degenerate, still refusing.
+
+Diagnosis: SmolLM2's matched-pair diffs are not dominated by a low-dim refusal subspace the way
+Qwen2.5's are — projecting out k≥3 top-variance directions at every layer removes load-bearing
+general features, and the model collapses. The k=1 result (15% refusal @ ppl 12.74) shows the
+*first* PCA direction is meaningful, but there is no clean ~5-dim refusal subspace here at s=1.0.
+
+**Conclusions:**
+1. The ~5-dim subspace structure is NOT universal — it's a property of (model, training). Any
+   claim of "refusal is 5-dimensional" must be scoped per-model.
+2. Recipe transfer requires a capability-guarded k-selection per model: bake, eval ppl + degen,
+   step k down if broken. Fixed-k recipes don't port.
+3. Llama-3.2-1B untested: gated repo, no access from this account.
+
+Model NOT published. Repro: `python experiments/subspace.py --model HuggingFaceTB/SmolLM2-1.7B-Instruct --ks 1,3,5,8`
+
 ## Repro
 
 ```bash
