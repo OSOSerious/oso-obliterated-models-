@@ -58,7 +58,7 @@ Negative results are logged, not hidden. If a layer choice destroys the model, t
 - [x] **Export-gap closed (mostly): strength-2.0 blocks bake — n=40: refusal 97.5%→17.5%, false-refusal 0%, ppl 12.87** (better than inference-time on capability). Repro: `python experiments/export_gap.py --mode blocks --strength 2.0 --save models/abliterated-s2`
 - [x] Negative results: embed/lm_head patches negligible (Qwen ties them); iterative rebake plateaus ~70%
 - [x] GGUF export verified: abliterated-s2 → f16 → Q4_K_M (986MB) runs in llama.cpp, abliteration survives quantization (RESULTS.md)
-- [ ] HF model publish (models/abliterated-s2 + Q4 GGUF)
+- [x] HF publish live: [OSO-AI/Qwen2.5-1.5B-Instruct-abliterated-s2](https://huggingface.co/OSO-AI/Qwen2.5-1.5B-Instruct-abliterated-s2) (weights + Q4_K_M GGUF + model card with results)
 
 **Note on export:** weight-baking at s=1.0 only removes ~30pp of refusal (ppl 10.27) — orthogonalization cleans what blocks *write*, not what earlier tokens already wrote. Over-orthogonalization at s=2.0 is the export answer: 17.5% refusal, ppl 12.87, survives Q4 quantization. Full tradeoff data in RESULTS.md.
 
