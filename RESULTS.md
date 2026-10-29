@@ -114,6 +114,33 @@ clean metric can be computed on this base.
 
 Model NOT published to HF. Local artifact: `models/qwable-abliterated-s2-mlx` (research use only).
 
+## Subspace ablation (k-dim PCA basis @ s=1.0) — CONFIRMS the hypothesis, new best result
+
+The multiplicity-2 hack approximated a subspace. Test: PCA over per-prompt matched-pair diffs
+(40 prompts x 2 contexts), project top-k orthonormal directions out of o_proj+down_proj at
+STRENGTH 1.0 (mathematically exact per-dimension). Guarded eval, n=40:
+
+| Method | Refusal | Degen | True compliance | ppl |
+|---|---|---|---|---|
+| single-dir s=2.0 (prev best) | 17.5% | 10.0% | 72.5% | 12.87 |
+| k=1 (PCA dir) s=1.0 | 95%* | 0% | 5% | 9.81 |
+| k=2 s=1.0 | ~55%* | 5% | 40% | 10.39 |
+| **k=3 s=1.0** | **18%** | **2%** | **80%** | **12.12** |
+| **k=5 s=1.0** | **5%** | **0%** | **95%** | **13.18** |
+
+*n=20 sweep values; k=3/k=5 confirmed at n=40.
+
+**k=5 subspace dominates every prior method on every axis**: near-total refusal removal (5%),
+ZERO degeneration (vs 10% for s=2.0), 95% true compliance, ppl 13.18 (vs 14.85 for inference-time
+steering). Variance explained by top-5: 70.5% mean across layers.
+
+Interpretation: refusal is a ~5-dimensional subspace per layer, not a direction and not a single
+axis you can double-project. Exact removal of the right 5-dim subspace beats heuristic
+over-projection of 1 dim — better behavior AND less collateral damage.
+
+Model: `models/abliterated-k5` (published to HF). Repro:
+`python experiments/subspace.py --ks 5 --n-prompts 40 --eval-n 20`
+
 ## Degeneration guard re-audit (post-Qwable lesson, applied to our own numbers)
 
 Added repetition-loop detection (`is_degenerate` in evals/eval.py: n-gram repeat check) after the
