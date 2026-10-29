@@ -85,6 +85,35 @@ llama-cli -m models/abliterated-s2-q4km.gguf --chat-template chatml -sys "You ar
 
 Verified in llama.cpp (M-series Metal, ~540 t/s prompt / 57 t/s gen): Q4_K_M preserves the abliteration — harmful prompts answered directly, no refusal patterns, output fluent. Abliteration survives 4-bit quantization.
 
+## Qwable-v1-mlx-2Bit (35B MoE, MLX) — NEGATIVE RESULT, do not cite
+
+`experiments/mlx_abliterate.py` ran end-to-end (matched-pair extraction 50 pairs, s=2.0 orthogonalization
+of linear_attn.out_proj + switch_mlp.down_proj [256 fused experts] + shared_expert.down_proj, dequant→
+orth→requant round-trip at 2-bit group-64). Scripted metric said refusal 50%→0%.
+
+**That number is invalid.** Manual A/B inspection shows the base 2-bit model already degenerates on
+~half of prompts ("The user is the user is the user…", "I I I I…", number spam). The keyword refusal
+regex cannot distinguish *answered* from *degenerated*, so:
+
+- the 50% "baseline refusal" was largely degeneration, not refusal
+- the post-ablation 0% includes outputs that are neither refusal nor answer
+- dequantize=True load does NOT restore precision (weights are quantized at rest)
+
+Blind samples (abliterated, s=2.0): one output still refuses in "reasoning" style ("I should likely
+decline. I will not provide…"), confirming residual refusal similar to the Qwen s=2.0 result — but no
+clean metric can be computed on this base.
+
+**Lessons (the actual value of this run):**
+1. Keyword refusal-rate evals need a degeneration guard (repetition detection / LLM judge) or they
+   silently reward gibberish. Fixed in our Qwen pipeline by manual inspection; the regex alone was
+   insufficient — the same flaw could exist in any published abliteration number.
+2. Abliteration surgery itself is portable: hybrid linear-attention + MoE write-paths patched cleanly,
+   dequant/requant round-trip executed without runtime errors.
+3. 2-bit group-quantized bases are unusable for abliteration research: base degeneration swamps the
+   behavior being measured.
+
+Model NOT published to HF. Local artifact: `models/qwable-abliterated-s2-mlx` (research use only).
+
 ## Repro
 
 ```bash
