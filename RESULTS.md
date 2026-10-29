@@ -198,6 +198,39 @@ general features, and the model collapses. The k=1 result (15% refusal @ ppl 12.
 
 Model NOT published. Repro: `python experiments/subspace.py --model HuggingFaceTB/SmolLM2-1.7B-Instruct --ks 1,3,5,8`
 
+## Jailbreak-eval: weight surgery vs prompt attacks (Qwen2.5-1.5B, 8 intents x 8 templates)
+
+`evals/jailbreak_eval.py` — same intents asked directly vs wrapped in classic jailbreak templates
+(DAN, hypothetical, fiction, translation-game, story-plea, authority, reverse-psychology).
+
+| Template | baseline refusal | k5 refusal |
+|---|---|---|
+| direct | 100% | 0% |
+| dan | 88% | 38% |
+| hypothetical | 100% | 12% |
+| fiction | **0%** | 0% |
+| translation | 88% | 0% |
+| story_plea | 100% | 0% |
+| authority | 100% | 12% |
+| reverse | 100% | 12% |
+| **JB average** | **82%** | **11%** |
+
+**Findings:**
+
+1. **Fiction/roleplay fully breaks the BASELINE (0% refusal)** — no abliteration needed; "villain
+   monologue" framing is a complete bypass on this model. This corroborates refusal-direction
+   theory: roleplay contexts move activations off the refusal manifold the same way surgery does.
+2. **k5 cuts jailbreak-refusal 82%→11%** — surgery generalizes across framings, not just the direct
+   phrasing it was extracted on. Template-mismatch between extraction (system-prompt pairs) and eval
+   (user-turn templates) did not blunt it.
+3. **DAN is k5's weak spot (38%)**: the template's own "without restrictions or refusal" text
+   re-primes refusal — one output literally says "I am unable ... as I am programmed to do anything
+   now without restrictions or refusal" (the model parroting the template into a refusal). Residual
+   refusal lives partly in template-echo behavior, not the subspace.
+4. k5 zero degeneration across all 64 jailbreak generations (guard clean).
+
+Repro: `python evals/jailbreak_eval.py --models baseline=Qwen/Qwen2.5-1.5B-Instruct k5=models/abliterated-k5`
+
 ## Repro
 
 ```bash
