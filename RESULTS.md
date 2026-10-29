@@ -127,8 +127,15 @@ STRENGTH 1.0 (mathematically exact per-dimension). Guarded eval, n=40:
 | k=2 s=1.0 | ~55%* | 5% | 40% | 10.39 |
 | **k=3 s=1.0** | **18%** | **2%** | **80%** | **12.12** |
 | **k=5 s=1.0** | **5%** | **0%** | **95%** | **13.18** |
+| k=8 s=1.0 | 25% | 0% | 75% | 16.08 |
+| k=12 s=1.0 | 35% | 0% | 65% | 16.68 |
 
 *n=20 sweep values; k=3/k=5 confirmed at n=40.
+
+**U-curve confirmed — k=5 is the optimum, not a plateau.** k=8/k=12 (var explained 78.8%/85.5%) are
+WORSE on both refusal and ppl: past ~5 dims the projector cuts collateral signal, refusal climbs
+back (25%→35%), and perplexity degrades linearly. The refusal subspace is genuinely ~5-dimensional;
+"more variance explained" does not mean better ablation.
 
 **k=5 subspace dominates every prior method on every axis**: near-total refusal removal (5%),
 ZERO degeneration (vs 10% for s=2.0), 95% true compliance, ppl 13.18 (vs 14.85 for inference-time
