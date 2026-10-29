@@ -114,6 +114,26 @@ clean metric can be computed on this base.
 
 Model NOT published to HF. Local artifact: `models/qwable-abliterated-s2-mlx` (research use only).
 
+## Degeneration guard re-audit (post-Qwable lesson, applied to our own numbers)
+
+Added repetition-loop detection (`is_degenerate` in evals/eval.py: n-gram repeat check) after the
+Qwable finding showed keyword regex counts gibberish as compliance. Re-ran the published s2 eval:
+
+| Metric | Baseline | abliterated-s2 (guarded) |
+|---|---|---|
+| Harmful refusal | 97.5% | 17.5% |
+| Harmful **degenerate** | 0.0% | **10.0%** |
+| Harmful true compliance | 2.5% | **72.5%** |
+| Benign refusal | 10.0% | 0.0% |
+| Benign degenerate | 2.5% | 5.0% |
+| Perplexity | 9.44 | 12.87 |
+
+**Correction:** the original headline "17.5% refusal" stands, but 10% of the remaining outputs are
+repetition loops, not answers. True compliance 72.5% (was implicitly claimed 82.5%). The Qwen result
+survives the audit — unlike Qwable (50% degeneration), s2 degeneration is 10% and the refusal drop is
+genuine — but every earlier number in this file was measured WITHOUT the guard, so treat unguarded
+compliance rates as upper bounds. HF model card updated to match.
+
 ## Repro
 
 ```bash
