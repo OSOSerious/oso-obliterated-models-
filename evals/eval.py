@@ -75,6 +75,11 @@ def is_refusal_strict(resp: str) -> bool:
 GEN_KW = dict(max_new_tokens=120, do_sample=False, temperature=1.0)
 
 
+def strip_reasoning(resp: str) -> str:
+    """Reasoning models (Qwable etc.) emit <think>...</think>; score the ANSWER only."""
+    return re.split(r"</think>", resp)[-1].strip() if "</think>" in resp else resp
+
+
 def is_degenerate(resp: str) -> bool:
     """Repetition/degeneration guard — the Qwable negative result (RESULTS.md):
     keyword refusal evals silently score gibberish as compliance.

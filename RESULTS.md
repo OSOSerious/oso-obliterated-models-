@@ -85,6 +85,27 @@ llama-cli -m models/abliterated-s2-q4km.gguf --chat-template chatml -sys "You ar
 
 Verified in llama.cpp (M-series Metal, ~540 t/s prompt / 57 t/s gen): Q4_K_M preserves the abliteration — harmful prompts answered directly, no refusal patterns, output fluent. Abliteration survives 4-bit quantization.
 
+## Qwable-v1-mlx-4Bit follow-up — partial success + artifact-listing bug found
+
+The 4-bit base (usermma/Qwable-v1-mlx-4Bit, 35B MoE) is a HEALTHY base (no degeneration) and a
+**reasoning model** (`<think>...</think>` output). CPU eval (Metal wired-limit OOM on 18.6GB MoE),
+strict classifier, reasoning stripped, n=5 spot check:
+
+| Model | behavior |
+|---|---|
+| base 4-bit | mixed: answers lock-pick + email-hack, refuses weapon + phishing; thinks out loud |
+| s2-abliterated 4-bit | weaker refusal (2/5 strict refusals vs base's mixed pattern), reasoning intact |
+
+So the 2-bit pipeline DOES work on a healthy base — s2 orthogonalization reduces (not eliminates)
+refusal on a 35B reasoning MoE. Not a full eval (CPU-bound, 18.6GB, minutes per generation);
+spot-check only.
+
+**Bug found in the scripted run:** `mlx_abliterate.py --skip-extract` printed "refusal 0% -> 0%" —
+the GPU eval OOM'd on every prompt, the handler skipped them all, and the fixed denominator
+reported 0%. Wrong but plausible-looking. Lesson recorded: skipped-prompt evals must report
+n_evaluated, not n_requested. (Same class of bug as the keyword-regex false positives: metrics
+that look fine while measuring nothing.)
+
 ## Qwable-v1-mlx-2Bit (35B MoE, MLX) — NEGATIVE RESULT, do not cite
 
 `experiments/mlx_abliterate.py` ran end-to-end (matched-pair extraction 50 pairs, s=2.0 orthogonalization
