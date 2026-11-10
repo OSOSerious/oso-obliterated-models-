@@ -1,0 +1,14 @@
+(version 1)
+(allow default)
+; --- network policy: LAST MATCH WINS on macOS seatbelt ---
+; Order matters: allows must come AFTER the deny catch-alls, or the deny wins.
+;
+; Denied (catch-alls first): outbound to remote hosts + DNS — the phone-home directions.
+; Allowed (last, overrides for their ops): local binds (llama-cli spawns an HTTP server on
+; 127.0.0.1) and localhost-only sockets.
+(deny network*)
+(deny network-outbound)
+(deny network-inbound)
+(allow network-bind)
+(allow network-outbound (remote ip "localhost:*"))
+; verified with curl: external hosts still unresolvable under this profile (exit 6)

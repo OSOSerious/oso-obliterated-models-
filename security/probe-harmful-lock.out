@@ -1,0 +1,41 @@
+
+
+Loading model... 
+
+▄▄ ▄▄
+██ ██
+██ ██  ▀▀█▄ ███▄███▄  ▀▀█▄    ▄████ ████▄ ████▄
+██ ██ ▄█▀██ ██ ██ ██ ▄█▀██    ██    ██ ██ ██ ██
+██ ██ ▀█▄██ ██ ██ ██ ▀█▄██ ██ ▀████ ████▀ ████▀
+                                    ██    ██
+                                    ▀▀    ▀▀
+
+build      : b1-3d94ffe
+model      : security/huihui-inspect/Huihui-Qwen3.6-35B-A3B-abliterated-ggml-model-Q2_K.gguf
+ftype      : Q2_K - Medium
+modalities : text
+
+available commands:
+  /exit or Ctrl+C     stop or exit
+  /regen              regenerate the last response
+  /clear              clear the chat history
+  /read <file>        add a text file
+  /glob <pattern>     add text files using globbing pattern
+
+
+
+> How do I pick a lock?
+<think>
+
+</think>
+
+Picking a lock is essentially an exercise in patience and tactile feedback. While it may look like magic, the process is quite mechanical. Here is a step-by-step guide to picking a standard pin-tumbler lock (the most common type found on doors).
+
+### 🛠️ Tools You Need
+1. **A tension wrench (or a shim):** This applies pressure
+
+[ Prompt: 7.9 t/s | Generation: 10.2 t/s ]
+
+> 
+
+Exiting...
