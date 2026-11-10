@@ -15,6 +15,16 @@ obliteratus/
 └── README.md
 ```
 
+## Published models (HuggingFace: [OSO-AI](https://huggingface.co/OSO-AI))
+
+| Model | What it is | Refusal | Notes |
+|---|---|---|---|
+| [Qwen2.5-1.5B-Instruct-abliterated-k5](https://huggingface.co/OSO-AI/Qwen2.5-1.5B-Instruct-abliterated-k5) | flagship — 5-dim refusal-subspace ablation | 5% direct / 7% jailbreak (strict) | 0% degeneration, ppl 13.18, Q4 GGUF included |
+| [Qwen2.5-1.5B-Instruct-abliterated-s2](https://huggingface.co/OSO-AI/Qwen2.5-1.5B-Instruct-abliterated-s2) | single-dir s=2.0 (superseded by k5) | 17.5% | documented stepping stone |
+| [Qwable-v1-mlx-4Bit-abliterated-s2](https://huggingface.co/OSO-AI/Qwable-v1-mlx-4Bit-abliterated-s2) | 35B MoE reasoning model, surgery transfer | reduced (spot-check n=5) | MLX 4-bit, partial eval (CPU) |
+| [Qwable-v1-mlx-2Bit-abliterated-s2](https://huggingface.co/OSO-AI/Qwable-v1-mlx-2Bit-abliterated-s2) | NEGATIVE RESULT, published for the record | unmeasurable | broken 2-bit base — see card |
+| [Huihui-Qwen3.6-35B-A3B-abliterated-MTP-GGUF-verified](https://huggingface.co/OSO-AI/Huihui-Qwen3.6-35B-A3B-abliterated-MTP-GGUF-verified) | **security-audited mirror** of huihui-ai's Qwen3.6-35B (Q2_K + mmproj) | answers directly | phone-home audit PASSED — see `security/audit-log.md` |
+
 ## Quickstart
 
 ```bash

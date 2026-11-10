@@ -5,3 +5,5 @@ models/
 directions/
 results/
 .DS_Store
+security/huihui-inspect/
+security/probe-run.log
