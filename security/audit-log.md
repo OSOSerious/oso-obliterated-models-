@@ -55,6 +55,22 @@
    visible Discord/node sockets belong to unrelated processes; llama's own footprint was
    localhost-only). Model run itself: exit 0 = loaded + answered.
 
+## GitHub-side audit of the on-disk model (huihui-ai)
+
+- `github.com/huihui-ai` EXISTS but is an **empty placeholder**: 0 public repos, 1 follower,
+  created 2020-09-28, no name/bio/blog. The model's "source" is HF-only — there is no GitHub
+  repo to trust or distrust. Distribution channel: HuggingFace (and an Ollama namespace
+  `ollama.com/huihui_ai`, referenced by third-party mirrors).
+- GitHub search for "Huihui-Qwen3.6": 708 hits, all CONSUMER/curation repos (uncensored-model
+  lists, deployment wrappers, quantizations) — none is the upstream. Notable fan-out:
+  `routerhubSI/uncensored-models` (curated list, 78 stars), `JoasASantos/Offensive-Security-
+  AI-Models` (822 stars), plus one-off mirror/deploy repos (`yanbo12338/abliterated-qwen-server`
+  "one-click deployment scripts" — executable third-party code, highest-risk vector in this
+  ecosystem, NOT audited/not needed for our use).
+- Supply-chain conclusion for OUR artifact: we consume ONLY the GGUF bytes (already proven
+  clean). No third-party scripts, mirrors, or deploy wrappers were executed. The GitHub
+  picture adds nothing to the phone-home question: the uploader has no code footprint at all.
+
 ## Behavior test status
 
 - probe-harmful-lock: ran to completion (exit 0), answer captured in probe-*.out — review next.
